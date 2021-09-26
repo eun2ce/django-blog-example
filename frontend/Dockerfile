@@ -1,9 +1,7 @@
-FROM node:12
+FROM node:14.15.4-alpine3.11
 
+COPY . /app/frontend/
 WORKDIR /app/frontend
-COPY package.json /app/frontend
-
-RUN npm install
 
 EXPOSE 8080
 CMD ["npm", "start"]

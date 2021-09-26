@@ -1,17 +1,8 @@
 version: '3'
 
-networks:
-  application-network:
-    driver: bridge
-  database-network:
-    driver: bridge
-  common-network:
-    driver: bridge
-
 services:
-  
   db:
-    image: postgres
+    image: postgres:9.1
     ports:
       - "5432:5432"
     environment:
@@ -23,27 +14,32 @@ services:
       - common-network
   
   backend:
-    build: ./backend
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - ./backend:/app/backend
+    build:
+      context: backend
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     depends_on:
       - db
+    links:
+      - db:db
     networks:
       - application-network
       - common-network
   
   frontend:
-    build: ./frontend
-    command: ["npm", "start"]
-    volumes:
-      - ./frontend:/app/frontend
+    build:
+      context: frontend
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     networks:
       - application-network
 
-volumes:
-  node-modules:
+networks:
+  application-network:
+    driver: bridge
+  database-network:
+    driver: bridge
+  common-network:
+    driver: bridge

@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM python:3.5
 
 RUN apt-get update \
@@ -5,9 +6,13 @@ RUN apt-get update \
         postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
+COPY . /app/backend/
 WORKDIR /app/backend
-COPY requirements.txt /app/backend
+
 RUN pip install -r requirements.txt
 
 EXPOSE 8000
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+#CMD ["python", "manage.py", "migrate"]
+#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD python manage.py migrate; python manage.py runserver 0.0.0.0:8000
