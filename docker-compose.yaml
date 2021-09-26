@@ -1,6 +1,15 @@
 version: '3'
 
+networks:
+  application-network:
+    driver: bridge
+  database-network:
+    driver: bridge
+  common-network:
+    driver: bridge
+
 services:
+  
   db:
     image: postgres
     ports:
@@ -9,6 +18,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
+    networks:
+      - database-network
+      - common-network
+  
   backend:
     build: ./backend
     command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
@@ -18,6 +31,10 @@ services:
       - "8000:8000"
     depends_on:
       - db
+    networks:
+      - application-network
+      - common-network
+  
   frontend:
     build: ./frontend
     command: ["npm", "start"]
@@ -25,6 +42,8 @@ services:
       - ./frontend:/app/frontend
     ports:
       - "8080:8080"
+    networks:
+      - application-network
 
 volumes:
   node-modules:
